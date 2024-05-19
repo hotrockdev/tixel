@@ -40,7 +40,7 @@
                     </tr>
                     <tr x-show="expanded.includes({{ $o->id }})">
                         <td colspan="9">
-                            <div class="max-w-7xl">
+                            <div>
                                 <table class="w-full divide-y divide-gray-200">
                                     @forelse($o->order_items as $i)
                                         <tr>
