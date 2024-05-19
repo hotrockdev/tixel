@@ -1,66 +1,60 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Pizza Restaurant Tech Challenge
 
-## About Laravel
+The pizza restaurant tech challenge is a simple demo of how to enable real time communications between a Laravel
+backend and a public facing website. This demo utilizes [Laravel Reverb](https://reverb.laravel.com) to allow for secure, 
+real time communication of events between the backend and a simulated public facing website.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Please note, this demo simply outputs the event to the Javascript console as building a frontend to display the 
+event data was not a requirement of this project. 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Installation
+This demo utilizes [Laravel Sail](https://laravel.com/docs/11.x/sail) to create a Docker based environment to run
+the Pizza Restaurant Challenge. It is assumed that a working version of Composer and Docker is currently installed 
+and properly configured on the host system. 
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+To install this application please perform the following:
+- Clone the application from the repo
+- Issue the following command in the root folder ``` composer install ```
+- Once the dependencies have been installed, copy the sample .env.example file to .env, making any necessary changes for your particular environment
+- The next step is to run the database migrations. Sample orders and a default user have been configured. To run the migrations and seed the database issue the following command: ``` ./vendor/bin/sail php artisan migrate --seed ```.
+- Once the migrations have completed, run the following command to compile the necessary frontend assets ``` ./vendor/bin/sail npm run build ```
+- The final step is to start Reverb by entering ``` ./vendor/bin/sail php artisan reverb:start```
+- At this point you can log into the app at http://localhost and use the following credentials, username: ```pizzaiolo@domain.com``` and password: ```secret```
 
-## Learning Laravel
+## Reviewing the demo
+Upon logging in you will be presented with a default Jetstream dashboard. The default Jetstream dashboard
+is a placeholder for the POS system the order management module is part of. My strategy was to leverage the Laravel
+Idea plugin to quickly generate Eloquent models, migration and factories for Orders and the items associated with an order.
+In a production capacity it's assumed that an order could consist of multiple items, however for the sake of this demo
+each Order consists of only one item, a pizza which has 4 possible states: ordered, started, cooking, completed. 
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+All pizzas start in the "ordered" state. Once the pizzaiolo begins the status is changed to "started". Once a pizza is 
+placed into the oven the status is updated to "cooking" and once the pizza is fully cooked, the status can be changed 
+to "completed".
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+In addition to updating the status in the database, an event is fired which broadcasts the current state of the pizza 
+using Reverb. State changes can be viewed in the Javascript console of your browser's development tools window. In a production
+site, the frontend would update the status of the pizza for a given order. In the event an order would contain multiple pizzas,
+the status of each pizza on an order could be shown independent of the other items. 
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+For simplicity the Reverb configuration has not been set to utilize a private channel or TLS, both of which would be configured
+when deploying to a production environment. Additionally, Laravel Sanctum could be utilized to provide an additional layer of
+authentication for Reverb.
 
-## Laravel Sponsors
+## Strategy
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+My strategy for this demo was to lean heavily on Laravel's robust ecosystem to quickly build out a robust module for managing
+the state of pizzas associated with an order. This demo utilizes the TALL stack (Tailwind, Laravel, Livewire, Alpine) to 
+provide basic UI functionality, Jetstream for authentication and profile management and Reverb to handle socket based communcation. 
+The demo consists of a single Livewire component called PizzaStatus which loads the current orders and their related items
+and displays them on a table. This table leverages Tailwind's responsive styles to hide non-essential columns to provide
+a functional layout on both desktop and mobile devices. 
 
-### Premium Partners
+AlpineJS is used to show the items for an order by clicking the "items" link, which expands the row immediately beneath
+the order to display the orders associated items. A simple dropdown menu is shown to allow switching between the various 
+states available for the pizza. When the status is changed, the setItemStatus() method is called on the PizzaStatus component
+that updates the database and fires the OrderItemUpdated event. This event broadcasts the order item id and current status 
+which could then be picked up by the public facing site in real time. 
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

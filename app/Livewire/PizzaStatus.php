@@ -24,7 +24,7 @@ class PizzaStatus extends Component
 
     public function mount()
     {
-        $this->orders = Order::orderBy('id')->get();
+        $this->orders = Order::with('order_items')->orderBy('id')->get();
         $this->statuses = OrderItemStatus::cases();
         $this->selected_statuses = $this->service->initSelectedStatus($this->orders);
     }
