@@ -18,8 +18,10 @@ To install this application please perform the following:
 - Clone the application from the repo
 - Issue the following command in the root folder ``` composer install ```
 - Once the dependencies have been installed, copy the sample .env.example file to .env, making any necessary changes for your particular environment
+- Now the environment can be built with the following command: ```./vendor/bin/sail up -d```
 - The next step is to run the database migrations. Sample orders and a default user have been configured. To run the migrations and seed the database issue the following command: ``` ./vendor/bin/sail php artisan migrate --seed ```.
-- Once the migrations have completed, run the following command to compile the necessary frontend assets ``` ./vendor/bin/sail npm run build ```
+- After the migrations have ran, install the required NPM dependencies ``` ./vendor/bin/sail npm install```
+- With the NPM dependencies install, run the following command to compile the necessary frontend assets ``` ./vendor/bin/sail npm run build ```
 - The final step is to start Reverb by entering ``` ./vendor/bin/sail php artisan reverb:start```
 - At this point you can log into the app at http://localhost and use the following credentials, username: ```pizzaiolo@domain.com``` and password: ```secret```
 
@@ -28,7 +30,8 @@ Upon logging in you will be presented with a default Jetstream dashboard. The de
 is a placeholder for the POS system the order management module is part of. My strategy was to leverage the Laravel
 Idea plugin to quickly generate Eloquent models, migration and factories for Orders and the items associated with an order.
 In a production capacity it's assumed that an order could consist of multiple items, however for the sake of this demo
-each Order consists of only one item, a pizza which has 4 possible states: ordered, started, cooking, completed. 
+each Order consists of only one item, a pizza which has 4 possible states: ordered, started, cooking, completed. To view
+the orders and change the status of the pizzas, use navigation menu to visit the Pizza Status page.
 
 All pizzas start in the "ordered" state. Once the pizzaiolo begins the status is changed to "started". Once a pizza is 
 placed into the oven the status is updated to "cooking" and once the pizza is fully cooked, the status can be changed 
