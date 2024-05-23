@@ -10,14 +10,13 @@ class PizzaStatusService
     public function initSelectedStatus($orders)
     {
         //Init the array
-        $selected_status = [];
+        $selected_statuses = [];
 
-        foreach ($orders as $order)
-        {
-            foreach($order->order_items as $i) { $selected_statuses[$i->id] = null; }
+        foreach ($orders->pluck('order_items')->flatten(1) as $order_item) {
+            $selected_statuses[$order_item->id] = null;
         }
 
-        return $selected_status;
+        return $selected_statuses;
     }
 
     public function updateItemStatus(OrderItems $order_item, $value)
