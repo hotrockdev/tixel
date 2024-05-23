@@ -22,7 +22,6 @@ class PizzaStatusService
     public function updateItemStatus(OrderItems $order_item, $value)
     {
         $order_item->status = $value;
-        $order_item->updated_at = now();
         $order_item->save();
 
         return $order_item;
